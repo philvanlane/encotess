@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "encotess"
+version = "0.1.0"
+description = "EncoTESS: latent light-curve encoder for TESS 2-min photometry"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Phil Van-Lane" }]
+keywords = ["astronomy", "TESS", "light curves", "autoencoder", "normalizing flows"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+    "torch>=2.0",
+    "numpy>=1.24",
+    "h5py>=3.8",
+    "zuko>=1.5",
+]
+
+[project.optional-dependencies]
+examples = ["matplotlib>=3.7"]
+dev = ["pytest>=7.4"]
+
+[project.urls]
+Homepage = "https://github.com/pvl19/encotess"
+
+[tool.setuptools]
+packages = ["encotess"]
+
+[tool.setuptools.package-data]
+encotess = ["weights/*", "data/*"]

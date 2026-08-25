@@ -1,0 +1,19 @@
+# Python build / cache artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local downloaded latent banks
+.cache/
+
+# The repo-root .gitignore excludes *.npz; the released package-data artifacts
+# (bundled weights + PCA-16 latents) are intentional and must be tracked.
+!encotess/weights/*.npz
+!encotess/data/*.npz
+
+# HF-bound artifacts built by tools/build_artifacts.py --steps pca_full (too large for git)
+dist/

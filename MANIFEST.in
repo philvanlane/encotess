@@ -1,0 +1,5 @@
+include README.md
+include LICENSE
+recursive-include encotess/weights *.pt *.npz
+recursive-include encotess/data *.csv *.npz
+recursive-include examples *.py
