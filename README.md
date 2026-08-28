@@ -32,7 +32,8 @@ pred = encotess.predict_flux(enc, flux, flux_err, time, metadata=meta)
 
 `meta` is a dict of the 13 metadata fields (`encotess.DEFAULT_METADATA_FIELDS`);
 missing fields may be omitted or set to NaN — the encoder was trained with a mask
-channel and handles them. Runnable examples are in `examples/`.
+channel and handles them. Short runnable scripts are in `examples/`, and step-by-step
+tutorial notebooks in `tutorials/`.
 
 ## PCA-space encodings
 
