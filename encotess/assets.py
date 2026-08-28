@@ -21,8 +21,8 @@ def _require(path: Path) -> Path:
     if not path.exists():
         raise FileNotFoundError(
             f"Bundled artifact not found: {path}\n"
-            "It may not have been generated yet — run the repackaging scripts in "
-            "`tools/` (see the release README).")
+            "This usually means an incomplete or corrupted install; try reinstalling "
+            "the package.")
     return path
 
 
