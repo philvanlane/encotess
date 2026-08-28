@@ -5,11 +5,12 @@ conditioned per-timestep on a non-linear time encoding and a stellar-metadata
 embedding. A zuko Neural Spline Flow head models the per-timestep flux
 distribution ``p(flux | context)``.
 
-This is the inference-only, release build: the research model's convolutional
-channels, split metadata encoders, and DANN sector adversary have been removed
-(the released ``sendit/e50`` checkpoint was trained without any of them, so the
-state dict loads unchanged). The log-domain parallel scan and the hard
-recurrence gating of masked positions are preserved exactly.
+This is the inference build. Training-only and experimental sub-modules that the
+released checkpoint does not use are omitted, so the shipped weights load into
+this class unchanged. The two behaviours that matter for reproducing the released
+encodings are preserved exactly: the log-domain parallel scan, and the hard
+recurrence gating of masked positions (a masked/padded step carries the hidden
+state forward and contributes nothing to the recurrence).
 """
 from __future__ import annotations
 

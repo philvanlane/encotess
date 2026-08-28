@@ -4,7 +4,7 @@ from _common import synthetic_lightcurve, DEMO_METADATA
 
 flux, flux_err, time = synthetic_lightcurve()
 
-enc = encotess.load_encoder()                      # bundled sendit/e100 encoder
+enc = encotess.load_encoder()                      # bundled EncoTESS encoder
 z = enc.encode(flux, flux_err, time, metadata=DEMO_METADATA)
 z16 = enc.project_pca(z, dim=16)
 

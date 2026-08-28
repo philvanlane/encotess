@@ -1,9 +1,9 @@
 """Light-curve I/O helpers for EncoTESS.
 
-Thin utilities over the project's HDF5 layout (datasets ``flux``, ``flux_err``,
-``time``, ``length`` and a ``metadata`` group) plus in-memory array packing. The
-heavy per-batch extraction loop lives in ``encode.py``; this module only reads
-the lightweight identifier/metadata tables and standardizes metadata.
+Thin utilities over the HDF5 light-curve layout EncoTESS reads (datasets ``flux``,
+``flux_err``, ``time``, ``length`` and a ``metadata`` group) plus in-memory array
+packing. The heavy per-batch extraction loop lives in ``encode.py``; this module
+only reads the lightweight identifier/metadata tables and standardizes metadata.
 """
 from __future__ import annotations
 

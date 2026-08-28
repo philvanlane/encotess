@@ -1,6 +1,6 @@
 """Stellar-metadata handling for the EncoTESS encoder.
 
-Two pieces, both extracted verbatim from the research code (``lcgen``):
+Two pieces:
 
 - ``MetadataStandardizer`` — deterministic, data-independent normalization of the
   13 raw metadata fields the encoder was trained on. Portable across datasets
@@ -37,8 +37,8 @@ DEFAULT_METADATA_FIELDS = [
     'iqr_half_flux',
 ]
 
-# Astrophysical vs instrumental split (used only by the split-encoder experiment
-# in the research code; kept here for parity with field-index lookups).
+# Astrophysical vs instrumental grouping of the fields. Not used by the released
+# single-encoder path; provided for callers that want to group fields by type.
 ASTRO_METADATA_FIELDS = [
     'Tmag', 'parallax', 'parallax_error', 'G0', 'G0_err',
     'BPRP0', 'BPRP0_err', 'median_flux', 'iqr_half_flux',

@@ -34,12 +34,11 @@ class Encoder:
         self.device = device
         self.hidden_size = model.hidden_size
         self._pca = None  # lazily loaded GlobalPCA
-        # Locked-in e100 extraction settings — reproduce the released latent banks
-        # bit-for-bit. head_norm: apply the trained head LayerNorm to the hidden
-        # states before pooling (raw minGRU states are non-negative; without it
-        # the latent is uncentered). minmax_edge_skip=0: the e100 banks take the
-        # global_min/global_max over the full hidden-state stream (no edge trim);
-        # verified to reproduce sendit/e100 latents_pretrain.npz to float32.
+        # Extraction settings that reproduce the released encodings bit-for-bit.
+        # apply_head_norm: apply the trained head LayerNorm to the hidden states
+        # before pooling (raw minGRU states are non-negative; without it the latent
+        # is uncentered). minmax_edge_skip=0: take the global_min/global_max over
+        # the full hidden-state stream (no edge trimming).
         self.apply_head_norm = True
         self.minmax_edge_skip = 0
 
@@ -83,7 +82,7 @@ class Encoder:
 
     # --------------------------------------------------------------- helpers
     def _pool(self, h_combined, t_combined):
-        """Time-aware multiscale pool -> 1536-d latent (released e100 settings)."""
+        """Time-aware multiscale pool -> 1536-d latent (released pooling settings)."""
         return compute_multiscale_features(
             h_combined, t_combined, n_segments=4,
             minmax_edge_skip=self.minmax_edge_skip,

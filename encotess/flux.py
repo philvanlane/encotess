@@ -6,8 +6,7 @@ module reproduces that prediction — at each target position ``j`` it condition
 the forward state ``k`` steps earlier and the backward state ``k`` steps later,
 then draws from the flow to get a median prediction and a p16–p84 band.
 
-This mirrors the research reconstruction (``compute_flow_predictions``); the band
-is the model's genuine predictive uncertainty at horizon ``k``.
+The band is the model's genuine predictive uncertainty at horizon ``k``.
 """
 from __future__ import annotations
 

@@ -1,10 +1,11 @@
 """Fixed global PCA projection of the 1536-d latents (numpy only, no sklearn).
 
-A single unsupervised global PCA (full-rank, 1536 comps, unwhitened; fit on the
-sendit/e100 latent banks) re-expresses every star's 1536-d latent in a decorrelated,
-variance-ordered basis. It is a lossless orthonormal rotation (invertible back to the
-latent), shipped as the PCA-space encodings. Reproduces
-``sklearn.decomposition.PCA.transform`` for the artifact in ``global_pca.npz``:
+A single unsupervised global PCA (full-rank, 1536 components, unwhitened; fit once
+over all released encodings) re-expresses every 1536-d latent in a decorrelated,
+variance-ordered basis. It is a lossless orthonormal rotation of the standardized
+latent (invertible back to it), and is what the package ships as the PCA-space
+encodings. ``transform`` reproduces ``sklearn.decomposition.PCA.transform`` for the
+fitted artifact in ``global_pca.npz``:
 
     X_norm = (X - X_mean) / (X_std + 1e-8)        # per-feature standardization
     Z      = (X_norm - pca_mean) @ components.T   # projection (keep dim comps)

@@ -1,10 +1,9 @@
 """Time-aware multi-scale pooling: per-timestep hidden states -> one latent vector.
 
-Extracted verbatim from the research code. The function defaults
-(``glob_mode='uniform'``, ``seg_mode='equal_count'``, ``diff_weight_mode='dt'``,
-``n_segments=4``) are exactly the locked-in pooling used to produce the released
-``sendit/e50`` latents, so a bidirectional hidden state of width H=128 yields a
-12*H = 1536-d latent:
+The function defaults (``glob_mode='uniform'``, ``seg_mode='equal_count'``,
+``diff_weight_mode='dt'``, ``n_segments=4``) are the pooling configuration used to
+produce the released encodings, so a bidirectional hidden state of width H=128
+yields a 12*H = 1536-d latent:
 
     [glob_mean, glob_std, glob_max, glob_min,
      seg0..seg3, first_h, last_h, diff_mean, diff_std]

@@ -1,18 +1,24 @@
-"""Repackage research artifacts into the shippable EncoTESS package data.
+"""Maintainer script: regenerate the shipped EncoTESS artifacts from the source
+training outputs.
 
-Run from the lc_ae repo root (the research artifacts live under final_model/ and
-final_pretrain/). Bundled in the wheel (small):
+This is NOT needed to *use* EncoTESS — every artifact it produces is already
+bundled in the package or downloadable. It exists to document provenance and to let
+the maintainer rebuild the artifacts reproducibly. It reads the trained model
+checkpoint and latent banks from the separate (unreleased) training repository, so
+it only runs in that environment; the path constants below point into that repo.
 
-    encotess/encotess/weights/encotess_weights.pt          (copy of sendit/e100 model.pt)
-    encotess/encotess/weights/global_pca.npz               (full-rank UNWHITENED PCA, refit)
-    encotess/encotess/data/latents_pca64.npz               (top-64 PCA, all light curves)
-    encotess/encotess/data/umap.npz                        (2-D UMAP embedding, all light curves)
+Bundled in the wheel (small):
 
-External host (HuggingFace); built into encotess/dist/ (gitignored), upload after building:
+    encotess/weights/encotess_weights.pt   (trained encoder checkpoint)
+    encotess/weights/global_pca.npz        (full-rank UNWHITENED global PCA, refit)
+    encotess/data/latents_pca64.npz        (top-64 PCA encoding, all light curves)
+    encotess/data/umap.npz                 (2-D UMAP embedding, all light curves)
 
-    encotess/dist/encodings_pca_full.npz                   (full 1536-d PCA, ~400 MB)
-    encotess/dist/metadata_per_sector.csv                  (per-light-curve metadata, ~14 MB)
-    encotess/dist/metadata_per_star.csv                    (per-star metadata, ~4.5 MB)
+External host (HuggingFace); built into dist/ (gitignored), uploaded after building:
+
+    dist/encodings_pca_full.npz            (full 1536-d PCA encoding, ~400 MB)
+    dist/metadata_per_sector.csv           (per-light-curve metadata, ~14 MB)
+    dist/metadata_per_star.csv             (per-star metadata, ~4.5 MB)
 
 Usage:
     python tools/build_artifacts.py --steps encoder,pca,pca_preview,umap
@@ -28,18 +34,17 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# --- paths -----------------------------------------------------------------
-REPO = Path(__file__).resolve().parents[2]           # .../lc_ae
-PKG = Path(__file__).resolve().parents[1] / 'encotess'  # .../encotess/encotess
+# --- paths (into the separate training repository) -------------------------
+REPO = Path(__file__).resolve().parents[2]           # training repo root
+PKG = Path(__file__).resolve().parents[1] / 'encotess'  # the importable package dir
 WEIGHTS = PKG / 'weights'
 DATA = PKG / 'data'
 
-# Everything is based on the sendit/e100 final model. model.pt is weight-identical
-# to best_model.pt; the plain (non-merged) latent banks are the encoder-native
-# banks that encode.py reproduces bit-for-bit (minmax_edge_skip=0).
+# Trained encoder checkpoint + the latent banks it produced. The plain (non-merged)
+# banks are the encoder-native banks that encode.py reproduces bit-for-bit.
 MODEL_SRC = REPO / 'final_model/sendit/e100/model.pt'
-# d16 cache: canonical e100 PCA standardization (X_mean/X_std) + the top-16 basis
-# the full-rank refit must reproduce.
+# Reference PCA cache: the canonical standardization (X_mean/X_std) + the deployed
+# top-16 basis that the full-rank refit is checked against.
 PCA_D16_SRC = REPO / 'final_model/sendit/e100/age_inference/shared/global_pca_d16.npz'
 LATENT_BASE = REPO / 'final_model/sendit/e100'
 UMAP_SRC = LATENT_BASE / 'umap/umap_age_best_model_multiscale_data.npz'
@@ -79,7 +84,7 @@ def step_pca(chunk=4000):
     """Refit the global PCA to FULL rank (1536 comps), UNWHITENED, and verify that
     its top-16 reproduces the deployed d16 basis exactly.
 
-    Memory-safe: standardizes with the d16 cache's X_mean/X_std (the canonical e100
+    Memory-safe: standardizes with the reference cache's X_mean/X_std (the canonical
     standardization) and accumulates the 1536x1536 covariance in chunks, so it never
     holds the whole 70,438x1536 matrix. Eigendecomposition of the covariance gives
     the PCA components (== sklearn PCA up to sign; svd_flip applied)."""
