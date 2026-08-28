@@ -30,7 +30,7 @@ tutorials = ["matplotlib>=3.7", "jupyter>=1.0"]
 dev = ["pytest>=7.4"]
 
 [project.urls]
-Homepage = "https://github.com/pvl19/encotess"
+Homepage = "https://github.com/philvanlane/encotess"
 
 [tool.setuptools]
 packages = ["encotess"]

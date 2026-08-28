@@ -7,13 +7,13 @@ dist/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# Local downloaded latent banks
+# Local cache for on-demand downloads (the full PCA encoding)
 .cache/
 
-# The repo-root .gitignore excludes *.npz; the released package-data artifacts
-# (bundled weights + PCA-16 latents) are intentional and must be tracked.
+# Keep the bundled package-data artifacts tracked even if a broad *.npz rule is
+# ever added: the shipped weights and PCA/UMAP/PLS encodings are intentional.
 !encotess/weights/*.npz
 !encotess/data/*.npz
 
-# HF-bound artifacts built by tools/build_artifacts.py --steps pca_full (too large for git)
+# Staging area for the large file uploaded to HuggingFace (too big for git)
 dist/

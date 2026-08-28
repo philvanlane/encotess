@@ -60,6 +60,27 @@ def test_umap_bundle():
     assert z['embedding'].shape[0] == z['tic_ids'].shape[0]
 
 
+def test_pls_bundles():
+    # Both per-star PLS encodings load with numpy only, aligned to identifiers.
+    for k in (3, 16):
+        z = np.load(assets.pls_encoding_path(k), allow_pickle=False)
+        assert z['pls'].shape[1] == k
+        assert z['pls'].shape[0] == z['gaia_ids'].shape[0] == z['bank'].shape[0]
+        assert z['in_age_fit'].dtype == bool
+
+
+def test_metadata_bundles():
+    # Metadata CSVs are bundled (not downloaded) and load with the stdlib only.
+    import csv
+    n_lc = np.load(assets.pca_preview_path(), allow_pickle=False)['gaia_ids'].shape[0]
+    with open(assets.metadata_path('sector'), newline='') as f:
+        n_rows = sum(1 for _ in csv.reader(f)) - 1  # minus header
+    assert n_rows == n_lc  # per-light-curve table is row-aligned to the encodings
+    for which in ('FGKMcal_star', 'hosts_star', 'thickdisk_star'):
+        p = assets.metadata_path(which)
+        assert p.exists() and p.stat().st_size > 0
+
+
 def test_full_pca_is_lossless_rotation():
     # Full-rank unwhitened PCA is an orthonormal rotation -> invertible to the latent.
     enc = encotess.load_encoder(device='cpu')

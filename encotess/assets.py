@@ -1,8 +1,9 @@
-"""Locating bundled artifacts and fetching the large external latent banks.
+"""Locating bundled artifacts and fetching the large external PCA encoding.
 
-Small artifacts (encoder weights, full-rank global PCA, the top-64 PCA preview, the
-2-D UMAP embedding, metadata CSVs) ship inside the package under ``weights/`` and
-``data/``. The full 1536-d PCA encoding of every light curve is too large for a wheel
+Nearly everything ships inside the package under ``weights/`` and ``data/``: the
+encoder weights, the full-rank global PCA, the top-64 PCA preview, the 2-D UMAP
+embedding, the per-star PLS encodings, and every metadata CSV. The one exception is
+the full 1536-d PCA encoding of every light curve, which is too large for a wheel
 (~400 MB) and is downloaded on demand from an external host (HuggingFace) into a
 local cache.
 """
@@ -46,15 +47,52 @@ def umap_path() -> Path:
     return _require(_DATA / 'umap.npz')
 
 
-# ---- large external artifacts (HuggingFace) ------------------------------
-# Downloaded on demand into the local cache; URLs/checksums are filled in once
-# uploaded. Until then the download helpers raise an informative error.
-#   - the full 1536-d PCA encoding (~400 MB)
-#   - the per-light-curve metadata CSVs (per-sector ~14 MB, per-star ~4.5 MB)
-PCA_FULL = {'url': None, 'sha256': None, 'filename': 'encodings_pca_full.npz'}
-METADATA = {
-    'per_sector': {'url': None, 'sha256': None, 'filename': 'metadata_per_sector.csv'},
-    'per_star':   {'url': None, 'sha256': None, 'filename': 'metadata_per_star.csv'},
+def pls_encoding_path(n_components: int = 3) -> Path:
+    """Bundled per-star PLS encoding (age-supervised projection of the latent).
+
+    ``n_components=3``: fit on the 2,893-star literature-Prot subset — reproduces the
+      paper's ``latent_pls3`` age model.
+    ``n_components=16``: fit on all 9,221 age-labelled stars (broader; median-age target).
+
+    Keys: ``gaia_ids``, ``bank`` (FGKMcal/hosts/thickdisk), ``pls`` (N, n_components),
+    and ``in_age_fit`` (whether the star was in the fit population). See DATASET.md.
+    """
+    if n_components == 3:
+        return _require(_DATA / 'encodings_pls3_star.npz')
+    if n_components == 16:
+        return _require(_DATA / 'encodings_pls16_star.npz')
+    raise ValueError(f"No PLS encoding with n_components={n_components} (have 3, 16).")
+
+
+_METADATA_FILES = {
+    'sector':         'metadata_sector.csv',
+    'FGKMcal_star':   'metadata_FGKMcal_star.csv',
+    'hosts_star':     'metadata_hosts_star.csv',
+    'thickdisk_star': 'metadata_thickdisk_star.csv',
+}
+
+
+def metadata_path(which: str = 'sector') -> Path:
+    """Path to a bundled metadata CSV.
+
+    ``which`` is one of: 'sector' (one row per light curve, row-aligned to the
+    encodings), 'FGKMcal_star', 'hosts_star', 'thickdisk_star' (one row per star).
+    See DATASET.md for the column dictionary and provenance.
+    """
+    if which not in _METADATA_FILES:
+        raise KeyError(
+            f"Unknown metadata {which!r}; choose from {list(_METADATA_FILES)}.")
+    return _require(_DATA / _METADATA_FILES[which])
+
+
+# ---- large external artifact (HuggingFace) -------------------------------
+# The full 1536-d PCA encoding is downloaded on demand into the local cache.
+# (Array key inside the npz: 'latents_pca'.) Hosted as a public HuggingFace dataset;
+# the sha256 is the file's git-LFS object id, verified against the uploaded file.
+PCA_FULL = {
+    'url': 'https://huggingface.co/datasets/philvanlane/encotess/resolve/main/encodings_pca_full.npz',
+    'sha256': '2edf5a73c67471b5cb83c9470b65a86d053d5078252a35c164ec40d1014d0e7f',
+    'filename': 'encodings_pca_full.npz',
 }
 
 
@@ -103,13 +141,3 @@ def download_latents_pca(force: bool = False) -> Path:
     preview (``encotess.assets.pca_preview_path()``).
     """
     return _download(PCA_FULL, 'full 1536-d PCA encoding', force)
-
-
-def download_metadata(which: str = 'per_sector', force: bool = False) -> Path:
-    """Fetch a per-light-curve metadata CSV ('per_sector' | 'per_star') to the cache.
-
-    Hosted on HuggingFace alongside the full PCA encoding.
-    """
-    if which not in METADATA:
-        raise KeyError(f"Unknown metadata {which!r}; choose from {list(METADATA)}.")
-    return _download(METADATA[which], f"{which} metadata CSV", force)
