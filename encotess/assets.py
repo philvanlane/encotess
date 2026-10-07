@@ -37,6 +37,16 @@ def pca_weights_path() -> Path:
     return _require(_WEIGHTS / 'global_pca.npz')
 
 
+def pls_projection_path() -> Path:
+    """Supervised PLS projection artifact (x_mean, x_std, x_rotations; 16 comps).
+
+    Fit on the 9,221 FGKMcal stars carrying an age. Components are nested, so to
+    keep fewer directions pass ``dim=`` to ``transform`` rather than looking for a
+    separate artifact.
+    """
+    return _require(_WEIGHTS / 'pls_projection.npz')
+
+
 def pca_preview_path() -> Path:
     """Bundled compact PCA encoding (top-64) for every released light curve."""
     return _require(_DATA / 'latents_pca64.npz')
@@ -47,21 +57,13 @@ def umap_path() -> Path:
     return _require(_DATA / 'umap.npz')
 
 
-def pls_encoding_path(n_components: int = 3) -> Path:
-    """Bundled per-star PLS encoding (age-supervised projection of the latent).
+def pls_encoding_path() -> Path:
+    """Bundled per-star PLS encoding: 16 age-covarying components per star.
 
-    ``n_components=3``: fit on the 2,893-star literature-Prot subset — reproduces the
-      paper's ``latent_pls3`` age model.
-    ``n_components=16``: fit on all 9,221 age-labelled stars (broader; median-age target).
-
-    Keys: ``gaia_ids``, ``bank`` (FGKMcal/hosts/thickdisk), ``pls`` (N, n_components),
-    and ``in_age_fit`` (whether the star was in the fit population). See DATASET.md.
+    Keys: ``gaia_ids`` (the primary key), ``pls`` (N, 16), and ``in_age_fit``
+    (whether the star was in the fit population). See DATASET.md.
     """
-    if n_components == 3:
-        return _require(_DATA / 'encodings_pls3_star.npz')
-    if n_components == 16:
-        return _require(_DATA / 'encodings_pls16_star.npz')
-    raise ValueError(f"No PLS encoding with n_components={n_components} (have 3, 16).")
+    return _require(_DATA / 'encodings_pls16_star.npz')
 
 
 _METADATA_FILES = {
@@ -75,9 +77,9 @@ _METADATA_FILES = {
 def metadata_path(which: str = 'sector') -> Path:
     """Path to a bundled metadata CSV.
 
-    ``which`` is one of: 'sector' (one row per light curve, row-aligned to the
-    encodings), 'FGKMcal_star', 'hosts_star', 'thickdisk_star' (one row per star).
-    See DATASET.md for the column dictionary and provenance.
+    ``which`` is one of: 'sector' (one row per light curve; join to the encodings on
+    (TIC_ID, sector)), 'FGKMcal_star', 'hosts_star', 'thickdisk_star' (one row per star,
+    keyed by GaiaDR3_ID). See DATASET.md for the column dictionary and provenance.
     """
     if which not in _METADATA_FILES:
         raise KeyError(
@@ -91,7 +93,7 @@ def metadata_path(which: str = 'sector') -> Path:
 # the sha256 is the file's git-LFS object id, verified against the uploaded file.
 PCA_FULL = {
     'url': 'https://huggingface.co/datasets/philvanlane/encotess/resolve/main/encodings_pca_full.npz',
-    'sha256': '2edf5a73c67471b5cb83c9470b65a86d053d5078252a35c164ec40d1014d0e7f',
+    'sha256': '0d253d9d06724be9ef51d91b0cf45bd4db278b94e4547e1d1e658e24d2b8c196',
     'filename': 'encodings_pca_full.npz',
 }
 

@@ -34,6 +34,7 @@ class Encoder:
         self.device = device
         self.hidden_size = model.hidden_size
         self._pca = None  # lazily loaded GlobalPCA
+        self._pls = None  # lazily loaded GlobalPLS
         # Extraction settings that reproduce the released encodings bit-for-bit.
         # apply_head_norm: apply the trained head LayerNorm to the hidden states
         # before pooling (raw minGRU states are non-negative; without it the latent
@@ -289,4 +290,31 @@ class Encoder:
             self._pca = GlobalPCA.from_npz(assets.pca_weights_path())
         z = np.atleast_2d(np.asarray(latents, dtype=np.float64))
         out = self._pca.transform(z, dim=dim)
+        return out[0] if np.ndim(latents) == 1 else out
+
+    def project_pls(self, latents, dim=None):
+        """Project 1536-d latents onto the supervised PLS (age) directions.
+
+        Unlike ``project_pca`` this is a *supervised* projection: the directions
+        were chosen to maximise covariance with ``log10(age/Myr)`` on the
+        labelled stars, so it is not an invertible rotation and has no explained
+        variance. Components are nested, so ``dim`` simply keeps the first
+        ``dim`` of the 16 available.
+
+        Rows are expected to be **per star**, aggregated across that star's
+        sectors with an element-wise maximum (``encotess.aggregate_by_star``);
+        projecting a single light curve's latent is valid but is not what the
+        released scores represent.
+
+        These scores describe age structure in the latent space. They are not a
+        validated age predictor, and because the projection saw the fit stars'
+        ages, they must not be used as features for an age model evaluated on
+        those stars — see ``encotess.pls`` for the full caveat.
+        """
+        if self._pls is None:
+            from encotess import assets
+            from encotess.pls import GlobalPLS
+            self._pls = GlobalPLS.from_npz(assets.pls_projection_path())
+        z = np.atleast_2d(np.asarray(latents, dtype=np.float64))
+        out = self._pls.transform(z, dim=dim)
         return out[0] if np.ndim(latents) == 1 else out

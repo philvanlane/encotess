@@ -26,7 +26,9 @@ dependencies = [
 
 [project.optional-dependencies]
 examples = ["matplotlib>=3.7"]
-tutorials = ["matplotlib>=3.7", "jupyter>=1.0"]
+# Light-curve download + preprocessing (encotess.preprocess, tutorial 1).
+preprocess = ["lightkurve>=2.4"]
+tutorials = ["matplotlib>=3.7", "jupyter>=1.0", "lightkurve>=2.4"]
 dev = ["pytest>=7.4"]
 
 [project.urls]
