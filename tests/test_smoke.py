@@ -235,3 +235,63 @@ def test_encoder_project_pls():
     assert enc.project_pls(z).shape == (16,)
     assert enc.project_pls(z, dim=3).shape == (3,)
     assert enc.project_pls(np.stack([z, z]), dim=5).shape == (2, 5)
+
+
+def test_age_model_infers_a_posterior():
+    m = encotess.load_age_model()
+    assert m.pls_dim == 3
+    assert m.feat_mean.shape == (3,) and m.feat_std.shape == (3,)
+
+    # a real released star: its PLS-3 scores come straight off the bundled encoding
+    sh = np.load(assets.pls_encoding_path(), allow_pickle=False)
+    feats = sh['pls'][:8, :3].astype(np.float64)
+
+    single = m.infer(feats[0], bprp0=1.1, bprp0_err=0.03)
+    for k in ('median', 'p16', 'p84', 'mean', 'map', 'age_myr'):
+        assert np.isscalar(single[k]) or np.ndim(single[k]) == 0
+    lo, hi = m.prior_loga_myr
+    assert lo <= single['p16'] <= single['median'] <= single['p84'] <= hi
+    assert np.isclose(single['age_myr'], 10 ** single['median'])
+
+    batch = m.infer(feats, bprp0=1.1, bprp0_err=0.03)
+    assert batch['median'].shape == (8,)
+    assert (batch['p16'] <= batch['p84'] + 1e-9).all()
+
+    # posterior is a normalized density over the grid
+    p = m.infer(feats[0], 1.1, 0.03, grid_size=256, return_posterior=True)
+    assert p['posterior'].shape == (256,) and p['loga_grid'].shape == (256,)
+    assert np.isclose(p['posterior'].sum(), 1.0, atol=1e-5)
+
+    import pytest
+    with pytest.raises(ValueError):
+        m.infer(feats[0][:2], 1.1, 0.03)                 # wrong feature count
+    with pytest.raises(ValueError):
+        m.infer(feats[:3], [1.1, 1.2], [0.03, 0.03])     # length mismatch
+    with pytest.raises(ValueError):
+        m.infer(np.array([np.nan, 0.0, 0.0]), 1.1, 0.03)  # non-finite features
+
+
+def test_age_model_tracks_age_in_sample():
+    # Sanity only: the model was trained on these stars, so this is in-sample and
+    # optimistic by construction. It guards against a silently broken artifact.
+    import csv
+    m = encotess.load_age_model()
+    sh = np.load(assets.pls_encoding_path(), allow_pickle=False)
+    meta = {r['GaiaDR3_ID'].strip(): r for r in
+            csv.DictReader(open(assets.metadata_path('FGKMcal_star'), newline=''))}
+    F, B, E, A = [], [], [], []
+    for g, p, fit in zip(sh['gaia_ids'], sh['pls'], sh['in_age_fit']):
+        r = meta.get(g)
+        if r is None or not fit:
+            continue
+        try:
+            a, b, be = float(r['age_Myr']), float(r['BPRP0']), float(r['BPRP0_err'])
+        except ValueError:
+            continue
+        if np.isfinite([a, b, be]).all():
+            F.append(p[:3]); B.append(b); E.append(be); A.append(a)
+        if len(F) >= 1500:
+            break
+    out = m.infer(np.array(F), np.array(B), np.array(E))
+    r = np.corrcoef(out['median'], np.log10(A))[0, 1]
+    assert r > 0.3, f'age correlation collapsed to {r:.3f}; artifact may be corrupt'

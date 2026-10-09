@@ -32,7 +32,11 @@ z   = enc.encode(flux, flux_err, time, metadata=meta)   # arrays + a 13-field di
 z16 = enc.project_pca(z, dim=16)
 zp3 = enc.project_pls(z, dim=3)                         # age-covarying directions
 
-# 2. Forecast flux a few steps ahead, with a 16th-84th percentile band
+# 3. Age posterior from those three components (demonstration model - see below)
+post = encotess.load_age_model().infer(zp3, bprp0=1.1, bprp0_err=0.03)
+#   -> {'median': ..., 'p16': ..., 'p84': ..., 'age_myr': ...} in log10(age/Myr)
+
+# 2b. Forecast flux a few steps ahead, with a 16th-84th percentile band
 pred = encotess.predict_flux(enc, flux, flux_err, time, metadata=meta)
 #   -> {'flux': median, 'p16': ..., 'p84': ..., 'time': ...}
 ```
@@ -93,9 +97,11 @@ per-star tables (`'FGKMcal_star'`, `'hosts_star'`, `'thickdisk_star'`, joined on
 | `encotess/flux.py` | `predict_flux`: forecast flux a few steps ahead, with a p16–p84 band |
 | `encotess/pca.py` | `GlobalPCA`: the PCA transform, in plain numpy |
 | `encotess/pls.py` | `GlobalPLS`: the supervised PLS (age-covariance) projection, in plain numpy |
+| `encotess/age.py` | `AgeNLE`: age posteriors from the PLS-3 scores (neural likelihood estimator) |
 | `encotess/weights/encotess_weights.pt` | the trained encoder |
 | `encotess/weights/global_pca.npz` | the fitted PCA (all 1536 directions) |
 | `encotess/weights/pls_projection.npz` | the fitted PLS projection (16 age-covarying directions) |
+| `encotess/weights/age_nle_pls3.pt` | the age likelihood model over the PLS-3 scores |
 | `encotess/data/latents_pca64.npz` | top-64 PCA encodings for every released light curve |
 | `encotess/data/umap.npz` | 2-D UMAP layout for every released light curve |
 | `encotess/data/encodings_pls16_star.npz` | per-star age view (PLS, 16 components) |

@@ -21,6 +21,7 @@ from encotess.encode import Encoder, load_encoder
 from encotess.flux import predict_flux
 from encotess.pca import GlobalPCA
 from encotess.pls import GlobalPLS, aggregate_by_star
+from encotess.age import AgeNLE, load_age_model
 from encotess.metadata import (
     MetadataStandardizer,
     DEFAULT_METADATA_FIELDS,
@@ -46,6 +47,8 @@ __all__ = [
     "predict_flux",
     "GlobalPCA",
     "GlobalPLS",
+    "AgeNLE",
+    "load_age_model",
     "aggregate_by_star",
     "MetadataStandardizer",
     "DEFAULT_METADATA_FIELDS",

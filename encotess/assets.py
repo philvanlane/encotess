@@ -37,6 +37,11 @@ def pca_weights_path() -> Path:
     return _require(_WEIGHTS / 'global_pca.npz')
 
 
+def age_weights_path() -> Path:
+    """Bundled PLS-3 age likelihood model (neural likelihood estimator)."""
+    return _require(_WEIGHTS / 'age_nle_pls3.pt')
+
+
 def pls_projection_path() -> Path:
     """Supervised PLS projection artifact (x_mean, x_std, x_rotations; 16 comps).
 
