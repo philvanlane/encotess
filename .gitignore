@@ -20,3 +20,6 @@ dist/
 
 # Local scratch for packaging material to send to collaborators (not part of the package)
 local/
+
+# macOS Finder metadata
+.DS_Store

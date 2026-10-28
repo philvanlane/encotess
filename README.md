@@ -4,9 +4,7 @@
 
 **EncoTESS** turns a 2-minute-cadence TESS light curve into a 1536-dim "latent" encoding. From that summary you can compare stars, explore structure across the sample, forecast the light curve a few steps ahead, or perform downstream tasks such as age inference.
 
-> ⚠️ **This repository is still under development** and its contents may still change.
-> When the accompanying paper is published, a fixed, citable version will be archived on
-> [Zenodo](https://zenodo.org/) with a DOI.
+> ⚠️ **EncoTESS is pre-1.0 and still under development**, so its contents may change between releases. A stable v1.0.0 will be released when the accompanying paper is published.
 
 ## Install
 
@@ -119,6 +117,37 @@ pca = assets.download_latents_pca()   # full 1536-direction PCA encoding (~400 M
 ```
 
 Inside `encodings_pca_full.npz`, the array is stored under the key `latents_pca`.
+
+## Citing
+
+If you use EncoTESS, please cite both the paper and the software:
+
+```bibtex
+@article{VanLane2026,
+  author        = {{Van-Lane}, Phil R. and {Speagle}, Joshua S. and {Cloutier}, Ryan and
+                   {Theissen}, Christopher A. and {Eadie}, Gwendolyn M. and {Kamai}, Ilay},
+  title         = {{EncoTESS: Age-Sensitive Encodings from Raw TESS Light Curves}},
+  journal       = {arXiv e-prints},
+  year          = {2026},
+  month         = aug,
+  eid           = {arXiv:2608.25019},
+  doi           = {10.48550/arXiv.2608.25019},
+  archivePrefix = {arXiv},
+  eprint        = {2608.25019},
+  primaryClass  = {astro-ph.SR}
+}
+
+@software{EncoTESS_v0.1.0,
+  author  = {{Van-Lane}, Phil},
+  title   = {{EncoTESS: latent light-curve encoder for TESS 2-min photometry}},
+  version = {0.1.0},
+  year    = {2026},
+  month   = oct,
+  url     = {https://github.com/philvanlane/encotess}
+}
+```
+
+The same information is in [`CITATION.cff`](CITATION.cff).
 
 ## License
 
