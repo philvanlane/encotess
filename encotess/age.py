@@ -30,7 +30,7 @@ Usage::
 
 Scope and caveats
 -----------------
-This model was trained on **all** 9,413 labelled stars with no held-out split —
+This model was trained on **all** 9,221 labelled stars with no held-out split —
 only a 15% carve-out to pick the stopping epoch. It is therefore a demonstration
 of the inference machinery, **not** a validated age predictor, and any accuracy
 measured on a star it was trained on is in-sample and optimistic. Honest

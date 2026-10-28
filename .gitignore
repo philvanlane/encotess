@@ -17,3 +17,6 @@ dist/
 
 # Staging area for the large file uploaded to HuggingFace (too big for git)
 dist/
+
+# Local scratch for packaging material to send to collaborators (not part of the package)
+local/

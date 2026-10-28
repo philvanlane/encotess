@@ -122,8 +122,9 @@ stars they were fit on** — good for seeing age-related structure in the latent
 an age predictor you should trust on new stars (careful, validated age prediction is a
 separate model). 
 
-Fit on the **9,221** labelled stars carrying an age, using the median age. Components are
-nested, so keeping the top `k` of the 16 is exactly a `k`-component fit.
+Fit on the **9,221** labelled stars carrying an age (see *Ages* below for how a star with
+several literature sources gets one). Components are nested, so keeping the top `k` of the
+16 is exactly a `k`-component fit.
 
 ### Projecting your own latents (`weights/pls_projection.npz`)
 
@@ -147,13 +148,12 @@ Exactly what it was fit on, for the record:
 | Stars | the 9,221 flagged `in_age_fit` in `encodings_pls16_star.npz` |
 | Equivalently | the FGKMcal stars that carry an age (9,221 of 11,517) |
 | Excluded entirely | hosts and thick-disk stars — both fits are FGKMcal-only |
-| Age values | the `age_Myr` column of `metadata_FGKMcal_star.csv` — the median of the literature ages |
+| Age values | the `age_Myr` column of `metadata_FGKMcal_star.csv` — ChronoFlow where available, else the median of the literature ages |
 | Target | `log10(age_Myr)` |
 | Hosts / thick-disk stars in the fit | none |
 
-The same values are stored inside `pls_projection.npz` (`age_source`, `fit_population`,
-`target`, `aggregation`, `n_fit_stars`). Use `encotess.GlobalPLS` /
-`Encoder.project_pls`, or the formula above.
+`pls_projection.npz` also carries `target`, `aggregation` and `n_fit_stars`. Use
+`encotess.GlobalPLS` / `Encoder.project_pls`, or the formula above.
 
 Three properties worth knowing:
 
@@ -165,9 +165,9 @@ Three properties worth knowing:
   deviation of ~22). The age pipeline z-scores them per fold; that is a property of a
   fold, not of the projection, so it is not applied here.
 
-This projection reproduces the released 16-component scores to a median residual of
-3.3e-6 of a component standard deviation. To keep fewer directions, pass `dim=k` —
-components are nested, so the top `k` are exactly what a `k`-component fit would give.
+`encodings_pls16_star.npz` is this exact projection applied to the released per-star
+latents, so the two are consistent by construction. To keep fewer directions, pass `dim=k`
+— components are nested, so the top `k` are exactly what a `k`-component fit would give.
 
 > **This projection is supervised, so it can leak.** It chose its directions using the
 > ages of the `in_age_fit` stars. Do not use these scores as input features for an age
@@ -183,9 +183,12 @@ components are nested, so the top `k` are exactly what a `k`-component fit would
   crossmatch on `GaiaDR3_ID`. Colours and magnitudes are **dereddened**; parallaxes are
   **zero-point corrected**. They agree between the light-curve files and the star tables to
   floating-point precision.
-- **Ages (`metadata_FGKMcal_star.csv`).** A star's age is the **median of the ages given by
-  the literature sources** for that star; `num_refs` counts those sources and `ref` lists
-  them.
+- **Ages (`metadata_FGKMcal_star.csv`).** Where several literature sources give an age for
+  the same star, they are reconciled as: **ChronoFlow's age if ChronoFlow is one of the
+  sources, otherwise the median of the sources.** No star in the sample has conflicting
+  ChronoFlow ages, so the first branch is unambiguous. `num_refs` counts the sources and
+  `ref` lists them, so the rule can be re-applied from the columns. Of the 9,221 stars
+  with an age, 2,470 resolve by ChronoFlow and 6,751 by median.
 - **Ages (`metadata_hosts_star.csv`).** Host ages are the NASA Exoplanet Archive stellar age
   (`st_age`), converted from Gyr to Myr. These are the ages used in the host-star age
   analysis.

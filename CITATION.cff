@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use EncoTESS, please cite it using the metadata from this file."
+type: software
+title: "EncoTESS: latent light-curve encoder for TESS 2-min photometry"
+version: 0.1.0
+date-released: "2026-10-28"
+authors:
+  - family-names: Van-Lane
+    given-names: Phil
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+    # affiliation: "TODO"
+license: MIT
+repository-code: "https://github.com/philvanlane/encotess"
+abstract: >-
+  EncoTESS turns a 2-minute-cadence TESS light curve into a 1536-dimensional
+  latent encoding. From that summary you can compare stars, explore structure
+  across the sample, forecast the light curve a few steps ahead, or perform
+  downstream tasks such as age inference. This release includes the trained
+  encoder, the fitted PCA and PLS projections, a demonstration age-inference
+  model, and the encodings and metadata for every light curve in the sample.
+keywords:
+  - astronomy
+  - TESS
+  - light curves
+  - autoencoder
+  - normalizing flows
