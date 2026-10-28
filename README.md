@@ -1,6 +1,7 @@
 # EncoTESS
 
 [![arXiv](https://img.shields.io/badge/arXiv-2608.25019-b31b1b.svg)](https://arxiv.org/abs/2608.25019)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23738984.svg)](https://doi.org/10.5281/zenodo.23738984)
 
 **EncoTESS** turns a 2-minute-cadence TESS light curve into a 1536-dim "latent" encoding. From that summary you can compare stars, explore structure across the sample, forecast the light curve a few steps ahead, or perform downstream tasks such as age inference.
 
@@ -137,17 +138,20 @@ If you use EncoTESS, please cite both the paper and the software:
   primaryClass  = {astro-ph.SR}
 }
 
-@software{EncoTESS_v0.1.0,
-  author  = {{Van-Lane}, Phil},
-  title   = {{EncoTESS: latent light-curve encoder for TESS 2-min photometry}},
-  version = {0.1.0},
-  year    = {2026},
-  month   = oct,
-  url     = {https://github.com/philvanlane/encotess}
+@software{EncoTESS,
+  author    = {{Van-Lane}, Phil},
+  title     = {{EncoTESS: latent light-curve encoder for TESS 2-min photometry}},
+  publisher = {Zenodo},
+  year      = {2026},
+  doi       = {10.5281/zenodo.23738984},
+  url       = {https://doi.org/10.5281/zenodo.23738984}
 }
 ```
 
-The same information is in [`CITATION.cff`](CITATION.cff).
+The software DOI above always resolves to the latest release. To cite the exact version
+you used, take its version-specific DOI from the
+[Zenodo record](https://doi.org/10.5281/zenodo.23738984). The same information is in
+[`CITATION.cff`](CITATION.cff).
 
 ## License
 

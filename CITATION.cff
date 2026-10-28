@@ -1,11 +1,13 @@
 cff-version: 1.2.0
 message: >-
-  If you use EncoTESS, please cite both the software (this record) and the
-  accompanying paper listed under "references".
+  If you use EncoTESS, please cite both the software and the accompanying
+  paper: Van-Lane et al. (2026), "EncoTESS: Age-Sensitive Encodings from Raw
+  TESS Light Curves", arXiv:2608.25019, doi:10.48550/arXiv.2608.25019.
 type: software
 title: "EncoTESS: latent light-curve encoder for TESS 2-min photometry"
 version: 0.1.0
 date-released: "2026-10-28"
+doi: "10.5281/zenodo.23738984"
 authors:
   - family-names: Van-Lane
     given-names: Phil
